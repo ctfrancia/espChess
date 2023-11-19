@@ -1,8 +1,8 @@
 config:
+  environment: dev
   application:
-    address: 127.0.0.1
+    host: 127.0.0.1
     port: 4000
-  environment: develop
   dbCreds:
     driverName: postgres
     host: 127.0.0.1

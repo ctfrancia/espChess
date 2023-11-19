@@ -3,30 +3,36 @@ package main
 import (
 	"fmt"
 	"flag"
+	"log/slog"
 	"os"
+	"net/http"
 
 	"github.com/spf13/viper"
 )
 
 type application struct {
-	cfg config
+	config config
+	logger *slog.Logger
 }
 type config struct {
-	port int
 	env string
+	port int
 	host string
 }
 
 func main() {
 	var cfg config
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
+	// get the environment from command line
 	flag.StringVar(&cfg.env, "env", "dev", "Environment(dev|sit|prod)")
 	flag.Parse()
 	if !validEnv(cfg.env) {
 		fmt.Println("Invalid environment: ", cfg.env)
 		os.Exit(1)
 	}
-	viper.SetConfigName("dev")
+	// set config from file
+	viper.SetConfigName(cfg.env)
 	viper.AddConfigPath("internal/config")
 	viper.SetConfigType("yaml")
 	err := viper.ReadInConfig() // Find and read the config file
@@ -34,5 +40,24 @@ func main() {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
 
-	fmt.Println("Hello, World!", viper.Get("config.dbCreds.port"))
+	// set application configuration based on environment
+	cfg.port = viper.GetInt("config.application.port")
+	cfg.host = viper.GetString("config.application.host")
+	cfg.env = viper.GetString("config.environment")
+	app := &application{
+		config: cfg,
+		logger: logger,
+	}
+
+	srv := &http.Server{
+		Addr: fmt.Sprintf(":%d", app.config.port),
+		Handler: app.routes(),
+	}
+
+	// start server with logger
+	msg := fmt.Sprintf("Starting %s server on %s", app.config.env, srv.Addr) 
+	logger.Info(msg)
+	err = srv.ListenAndServe()
+	logger.Error(err.Error())
+	os.Exit(1)
 }
