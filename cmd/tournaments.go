@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"github.com/julienschmidt/httprouter"
 )
 
 func (app *application) createTournamentHandler(w http.ResponseWriter, r *http.Request) {
@@ -11,5 +12,7 @@ func (app *application) createTournamentHandler(w http.ResponseWriter, r *http.R
 }
 
 func (app *application) showTournamentHandler(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	fmt.Fprintln(w, params)
 	fmt.Fprintln(w, "show tournament")
 }
