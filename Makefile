@@ -12,7 +12,7 @@ run-tests:
 
 run-dev:
 	@echo "Running server..."
-	@go run cmd/*.go
+	@go run cmd/*.go -env=dev
 
 run-sit:
 	@echo "Running server..."
