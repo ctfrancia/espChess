@@ -15,6 +15,11 @@ const (
 func (app *application) routes() *httprouter.Router {
 	router := httprouter.New()
 
+	// USERS
+	cu := fmt.Sprintf("%s/user", v1)
+	router.HandlerFunc(http.MethodPost, cu, app.createUserHandler)
+
+	// TOURNAMENTS
 	// v1 healthcheck
 	hcr := fmt.Sprintf("%s/healthcheck", v1)
 	router.HandlerFunc(http.MethodGet, hcr, app.healthcheckHandler)
