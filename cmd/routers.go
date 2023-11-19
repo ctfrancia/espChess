@@ -1,14 +1,28 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
+	"fmt"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
+)
+
+const (
+	v1 = "/v1"
+	v2 = "/v2"
 )
 
 func (app *application) routes() *httprouter.Router {
 	router := httprouter.New()
-	router.HandlerFunc(http.MethodGet, "/v1/healthcheck", app.healthcheckHandler)
-	// router.HandlerFunc(http.MethodPost, "/v1/movies", app.createMovieHandler)
-	// router.HandlerFunc(http.MethodGet, "/v1/movies/:id", app.showMovieHandler)
+
+	// v1 healthcheck
+	hcr := fmt.Sprintf("%s/healthcheck", v1)
+	router.HandlerFunc(http.MethodGet, hcr, app.healthcheckHandler)
+
+	ct := fmt.Sprintf("%s/tournament", v1)
+	router.HandlerFunc(http.MethodPost, ct, app.createTournamentHandler)
+
+	st := fmt.Sprintf("%s/tournament/:id", v1)
+	router.HandlerFunc(http.MethodGet, st, app.showTournamentHandler)
 	return router
 }

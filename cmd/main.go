@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 	"net/http"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -52,6 +53,9 @@ func main() {
 	srv := &http.Server{
 		Addr: fmt.Sprintf(":%d", app.config.port),
 		Handler: app.routes(),
+		IdleTimeout: time.Minute,
+		ReadTimeout: 10 * time.Second,
+		WriteTimeout: 30 * time.Second,
 	}
 
 	// start server with logger
